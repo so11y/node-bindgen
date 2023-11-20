@@ -1,5 +1,5 @@
 #[macro_export]
-macro_rules! impl_canvas_component_parent {
+macro_rules! canvas_component_parent_macro {
     () => {
         fn set_parent(&mut self, parent: Option<*const dyn CanvasComponentGroup>) {
             self.parent = parent;

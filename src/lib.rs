@@ -1,8 +1,7 @@
-
 mod components;
 
 pub use components::*;
-use leptos::wasm_bindgen::JsCast;
+use web_sys::wasm_bindgen::JsCast;
 use web_sys::{window, CanvasRenderingContext2d};
 
 pub struct CanvasOptions {
@@ -28,34 +27,25 @@ impl CanvasOptions {
 pub trait CanvasComponent {
     fn draw<'a>(&'a mut self, ctx: &mut CanvasRenderingContext2d);
     fn set_parent(&mut self, parent: Option<*const dyn CanvasComponentGroup>);
-    fn get_local_move_x(&self) -> f64 {
-        return 0.0;
-    }
-    fn get_local_move_y(&self) -> f64 {
-        return 0.0;
-    }
     fn get_parent(&self) -> Option<&dyn CanvasComponentGroup>;
     fn get_children(&self) -> Option<&Vec<Box<dyn CanvasComponent>>> {
         return None;
     }
     fn get_parent_location(&self) -> (f64, f64) {
         let parent = self.get_parent();
-        let (x, y) = if parent.is_none() {
-            (0 as f64, 0 as f64)
+        if parent.is_none() {
+            return (0 as f64, 0 as f64);
         } else {
-            let parent = parent.unwrap();
-            (parent.get_local_move_x(), parent.get_local_move_y())
-        };
-        return (x, y);
+            return parent.unwrap().get_translate();
+        }
     }
 }
 
-
 pub trait CanvasComponentGroup: CanvasComponent {
     fn add_child(&mut self, child: Box<dyn CanvasComponent>);
-    fn move_container(&mut self, x: f64, y: f64, ctx: &mut CanvasRenderingContext2d);
+    fn set_translate(&mut self, x: f64, y: f64);
+    fn get_translate(&self) -> (f64, f64);
 }
-
 
 pub fn canvas_context(dom_name: &str, canvas_options: CanvasOptions) -> CanvasRenderingContext2d {
     //  获取document

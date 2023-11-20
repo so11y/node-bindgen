@@ -1,7 +1,6 @@
-use crate::{impl_canvas_component_parent, CanvasComponent, CanvasComponentGroup};
+use crate::{canvas_component_parent_macro, CanvasComponent, CanvasComponentGroup};
 use web_sys::CanvasRenderingContext2d;
 
-#[derive(Debug)]
 pub struct Line {
     x: f64,
     y: f64,
@@ -19,5 +18,5 @@ impl CanvasComponent for Line {
         let (x, y) = self.get_parent_location();
         ctx.line_to(self.x + x, self.y + y);
     }
-    impl_canvas_component_parent!();
+    canvas_component_parent_macro!();
 }
