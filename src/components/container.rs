@@ -33,7 +33,7 @@ impl CanvasComponent for Container {
         let (x, y) = self.get_parent_location();
         let (tx, ty) = self.get_translate();
         ctx.set_stroke_style(&"red".into());
-        ctx.rect(self.x + x + tx, self.x + y + ty, self.width, self.height);
+        ctx.rect(self.x + x + tx, self.y + y + ty, self.width, self.height);
         ctx.stroke();
         self.children.iter_mut().for_each(|child| {
             child.set_parent(Some(current_ref));
