@@ -2,9 +2,9 @@
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, DeriveInput};
+use syn::{parse_macro_input, DeriveInput, Data, Fields};
 
-#[proc_macro_derive(CanvasGroupDropMacro)]
+#[proc_macro_derive(GroupDropMacro)]
 pub fn canvas_group_drop_macro(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let struct_name = &input.ident;
@@ -20,8 +20,8 @@ pub fn canvas_group_drop_macro(input: TokenStream) -> TokenStream {
     TokenStream::from(expanded)
 }
 
-#[proc_macro_derive(CanvasGroupMacro)]
-pub fn canvas_group_macro(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(GroupMacro)]
+pub fn group_macro(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let struct_name = &input.ident;
     let expanded = quote! {
@@ -40,5 +40,4 @@ pub fn canvas_group_macro(input: TokenStream) -> TokenStream {
 
     TokenStream::from(expanded)
 }
-
 

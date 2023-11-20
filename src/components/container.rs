@@ -4,18 +4,22 @@ use web_sys::CanvasRenderingContext2d;
 use crate::{canvas_component_parent_macro, CanvasComponent, CanvasComponentGroup};
 
 #[derive(GroupDropMacro, GroupMacro)]
-pub struct Lines {
+pub struct Container {
     x: f64,
     y: f64,
+    width: f64,
+    height: f64,
     translate: (f64, f64),
     parent: Option<*const dyn CanvasComponentGroup>,
     children: Vec<Box<dyn CanvasComponent>>,
 }
-impl Lines {
-    pub fn new(x: f64, y: f64) -> Self {
+impl Container {
+    pub fn new(x: f64, y: f64, width: f64, height: f64) -> Self {
         Self {
             x,
             y,
+            width,
+            height,
             translate: (0.0, 0.0),
             parent: None,
             children: Vec::new(),
@@ -23,24 +27,18 @@ impl Lines {
     }
 }
 
-impl CanvasComponent for Lines {
+impl CanvasComponent for Container {
     fn draw(&mut self, ctx: &mut CanvasRenderingContext2d) {
+        let current_ref = self as *const dyn CanvasComponentGroup;
         let (x, y) = self.get_parent_location();
         let (tx, ty) = self.get_translate();
-
-        ctx.begin_path();
-
-        ctx.move_to(self.x + x + tx, self.y + y + ty);
-
-        let current_ref = self as *const dyn CanvasComponentGroup;
-
+        ctx.set_stroke_style(&"red".into());
+        ctx.rect(self.x + x + tx, self.x + y + ty, self.width, self.height);
+        ctx.stroke();
         self.children.iter_mut().for_each(|child| {
             child.set_parent(Some(current_ref));
             child.draw(ctx);
         });
-        ctx.stroke();
-        ctx.close_path();
     }
-
     canvas_component_parent_macro!();
 }

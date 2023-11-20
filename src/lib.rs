@@ -25,7 +25,7 @@ impl CanvasOptions {
 }
 
 pub trait CanvasComponent {
-    fn draw<'a>(&'a mut self, ctx: &mut CanvasRenderingContext2d);
+    fn draw(&mut self, ctx: &mut CanvasRenderingContext2d);
     fn set_parent(&mut self, parent: Option<*const dyn CanvasComponentGroup>);
     fn get_parent(&self) -> Option<&dyn CanvasComponentGroup>;
     fn get_children(&self) -> Option<&Vec<Box<dyn CanvasComponent>>> {
