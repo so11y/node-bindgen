@@ -2,20 +2,20 @@
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, DeriveInput, Data, Fields};
+use syn::{parse_macro_input, DeriveInput};
 
 #[proc_macro_derive(GroupDropMacro)]
 pub fn canvas_group_drop_macro(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let struct_name = &input.ident;
     let expanded = quote! {
-        impl Drop for #struct_name {
-            fn drop(&mut self) {
-                self.children.iter_mut().for_each(|child| {
-                    child.set_parent(None);
-                });
-            }
-        }
+        // impl Drop for #struct_name {
+        //     fn drop(&mut self) {
+        //         self.children.iter_mut().for_each(|child| {
+        //             child.set_parent(None);
+        //         });
+        //     }
+        // }
     };
     TokenStream::from(expanded)
 }
@@ -25,19 +25,18 @@ pub fn group_macro(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let struct_name = &input.ident;
     let expanded = quote! {
-        impl CanvasComponentGroup for #struct_name {
-            fn add_child(&mut self, child: Box<dyn CanvasComponent>) {
+        impl ComponentGroup for #struct_name {
+            fn add_child(&mut self, child: Box<dyn Component>) {
                 self.children.push(child);
             }
-            fn set_translate(&mut self, x: f64, y: f64) {
-                self.translate = (x, y);
-            }
-            fn get_translate(&self) -> (f64, f64) {
-                return self.translate;
-            }
+            // fn set_translate(&mut self, x: f64, y: f64) {
+            //     self.translate = (x, y);
+            // }
+            // fn get_translate(&self) -> (f64, f64) {
+            //     return self.translate;
+            // }
         }
     };
 
     TokenStream::from(expanded)
 }
-

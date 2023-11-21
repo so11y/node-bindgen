@@ -1,44 +1,43 @@
 use derives::{GroupDropMacro, GroupMacro};
 use web_sys::CanvasRenderingContext2d;
 
-use crate::{canvas_component_parent_macro, CanvasComponent, CanvasComponentGroup};
+use crate::{component_macro, Component, ComponentGroup, Constraint};
 
 #[derive(GroupDropMacro, GroupMacro)]
 pub struct Container {
-    x: f64,
-    y: f64,
     width: f64,
     height: f64,
-    translate: (f64, f64),
-    parent: Option<*const dyn CanvasComponentGroup>,
-    children: Vec<Box<dyn CanvasComponent>>,
+    constraint: Option<Constraint>,
+    // translate: (f64, f64),
+    // parent: Option<*const dyn ComponentGroup>,
+    children: Vec<Box<dyn Component>>,
 }
 impl Container {
-    pub fn new(x: f64, y: f64, width: f64, height: f64) -> Self {
+    pub fn new(width: f64, height: f64) -> Self {
         Self {
-            x,
-            y,
             width,
             height,
-            translate: (0.0, 0.0),
-            parent: None,
+            constraint: None,
+            // parent: None,
             children: Vec::new(),
         }
     }
 }
 
-impl CanvasComponent for Container {
+impl Component for Container {
+    // fn layout(&mut self, constraint: Constraint) {
+    //     if constraint.maybe_constraint(self.width, self.height) {
+
+    //     }
+    // }
     fn draw(&mut self, ctx: &mut CanvasRenderingContext2d) {
-        let current_ref = self as *const dyn CanvasComponentGroup;
-        let (x, y) = self.get_parent_location();
-        let (tx, ty) = self.get_translate();
-        ctx.set_stroke_style(&"red".into());
-        ctx.rect(self.x + x + tx, self.y + y + ty, self.width, self.height);
-        ctx.stroke();
-        self.children.iter_mut().for_each(|child| {
-            child.set_parent(Some(current_ref));
-            child.draw(ctx);
-        });
+        // let current_ref = self as *const dyn CanvasComponentGroup;
+        // let (tx, ty) = self.get_translate();
+        // self.children.iter_mut().for_each(|child| {
+        //     child.set_parent(Some(current_ref));
+        //     child.draw(ctx);
+        // });
+        // ctx.rect(x + tx, y + ty, self.width, self.height);
     }
-    canvas_component_parent_macro!();
+    component_macro!();
 }
