@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Program",
+      "program": "${workspaceFolder}/index.js",
+      "request": "launch",
+      "type": "node"
+    },
+    {
+      "request": "launch",
+      "name": "attach:node",
+      "type": "lldb",
+      "program": "node",
+      "args": ["./index.js"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "mix-debug",
+      "configurations": [
+        "Launch Program",
+        "attach:node"
+        // "launch:rust-from-node"
+      ]
+    }
+  ]
+}

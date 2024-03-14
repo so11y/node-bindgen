@@ -1,54 +1,75 @@
-mod components;
-mod macro_rules;
-mod traits;
+mod ffi;
 
-pub use components::*;
-pub use macro_rules::*;
-pub use traits::*;
+use ffi::*;
+use std::{ffi::CString, ptr};
 
-use web_sys::wasm_bindgen::JsCast;
-use web_sys::{window, CanvasRenderingContext2d};
-
-pub struct CanvasOptions {
-    width: u32,
-    height: u32,
-}
-
-impl Default for CanvasOptions {
-    fn default() -> Self {
-        Self {
-            width: 300,
-            height: 300,
-        }
+fn fibonacci(n: i32) -> i32 {
+    if n <= 1 {
+        return n;
     }
-}
-impl CanvasOptions {
-    #[allow(dead_code)]
-    pub fn new(width: u32, height: u32) -> Self {
-        Self { width, height }
-    }
+    return fibonacci(n - 1) + fibonacci(n - 2);
 }
 
-pub fn canvas_context(dom_name: &str, canvas_options: CanvasOptions) -> CanvasRenderingContext2d {
-    //  获取document
-    let document = window().unwrap().document().unwrap();
-    //获取canvas
-    let canvas = document.get_element_by_id(dom_name).unwrap();
+unsafe extern "C" fn fibonacci_rust(env: NapiEnv, info: NapiCallbackInfo) -> NapiValue {
+    let mut this = ptr::null_mut();
+    let mut argv: [NapiValue; 2] = [ptr::null_mut(), ptr::null_mut()];
 
-    //转换为HtmlCanvasElement
-    let canvas: web_sys::HtmlCanvasElement = canvas
-        .dyn_into::<web_sys::HtmlCanvasElement>()
-        .map_err(|_| ())
-        .unwrap();
+    assert!(
+        napi_get_cb_info(
+            env,
+            info,
+            &mut argv.len(),
+            argv.as_mut_ptr(),
+            &mut this,
+            ptr::null_mut(),
+        ) == 0
+    );
 
-    canvas.set_width(canvas_options.width);
-    canvas.set_height(canvas_options.height);
-    //获取canvas的context
-    let context = canvas
-        .get_context("2d")
-        .unwrap()
-        .unwrap()
-        .dyn_into::<web_sys::CanvasRenderingContext2d>()
-        .unwrap();
-    return context;
+    let mut result = std::ptr::null_mut();
+
+    let mut arg1 = 0;
+    let mut arg2 = 0;
+
+    assert!(napi_get_value_int32(env, argv[0], &mut arg1) == 0);
+    assert!(napi_get_value_int32(env, argv[1], &mut arg2) == 0);
+
+    assert!(napi_create_int32(env, fibonacci(arg1) + fibonacci(arg2), &mut result) == 0);
+
+    return result;
 }
+
+#[no_mangle]
+pub unsafe extern "C" fn napi_register_module_v1(env: NapiEnv, exports: NapiValue) -> NapiValue {
+    let key = CString::new("hello").unwrap();
+    let value = CString::new("world").unwrap();
+
+    let mut str = ptr::null_mut();
+
+    let mut js_function = ptr::null_mut();
+
+    assert!(napi_create_string_utf8(env, value.as_ptr(), 5, &mut str) == 0);
+    assert!(napi_set_named_property(env, exports, key.as_ptr(), str) == 0);
+
+    let fibonacci_str = "fibonacci";
+    let fibonacci_name = CString::new(fibonacci_str).unwrap();
+
+    assert!(
+        napi_create_function(
+            env,
+            fibonacci_str.as_ptr() as *const i8,
+            fibonacci_str.len(),
+            Some(fibonacci_rust),
+            ptr::null_mut(),
+            &mut js_function,
+        ) == 0
+    );
+
+    assert!(napi_set_named_property(env, exports, fibonacci_name.as_ptr(), js_function) == 0);
+
+    exports
+}
+
+// #[link(name = "user32")]
+// extern "system" {
+//     fn SetCursorPos(x: c_int, y: c_int) -> c_int;
+// }
